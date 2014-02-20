@@ -69,7 +69,12 @@
     if ([self.previewItem respondsToSelector:@selector(remoteUrl)]
         && [(id <AMPPreviewItem>)self.previewItem remoteUrl]) {
         
-        [self downloadFile];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:[[self.previewItem previewItemURL] path]]) {
+            self.dataSource = self;
+            [self reloadData];
+        } else {
+            [self downloadFile];
+        }
         
     } else {
         self.dataSource = self;
@@ -95,10 +100,6 @@
         NSURL *path = [documentsDirectoryPath URLByAppendingPathComponent:[response suggestedFilename]];
         return path;
     } completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
-        if (self.finishDownloadBlock) {
-            self.finishDownloadBlock(error);
-        }
-        
         if (!error) {
             NSLog(@"File downloaded to: %@", filePath);
             
@@ -109,6 +110,10 @@
             
             self.dataSource = self;
             [self reloadData];
+        }
+        
+        if (self.finishDownloadBlock) {
+            self.finishDownloadBlock(error);
         }
     }];
     [downloadTask resume];
