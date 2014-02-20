@@ -1,0 +1,1 @@
+PODS_AMPPREVIEWCONTROLLER_OTHER_LDFLAGS = -framework QuickLook -framework UIKit
