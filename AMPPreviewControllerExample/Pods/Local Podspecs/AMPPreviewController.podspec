@@ -11,8 +11,8 @@ Pod::Spec.new do |s|
   	:git => 'https://github.com/alexito4/AMPPreviewController.git'
   }
   
-  s.dependency 'AFNetworking', '~> 2.1.0'
-
+  s.dependency 'AFNetworking', '~> 2.2'
+  
   s.platform = :ios
   s.source_files = '*.{h,m}'
   s.requires_arc = true

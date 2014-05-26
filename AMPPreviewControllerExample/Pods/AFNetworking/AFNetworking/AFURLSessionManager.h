@@ -1,6 +1,6 @@
 // AFURLSessionManager.h
 // 
-// Copyright (c) 2013 AFNetworking (http://afnetworking.com)
+// Copyright (c) 2013-2014 AFNetworking (http://afnetworking.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -117,7 +117,7 @@
 /**
  The network reachability manager. `AFURLSessionManager` uses the `sharedManager` by default.
  */
-@property (readonly, nonatomic, strong) AFNetworkReachabilityManager *reachabilityManager;
+@property (readwrite, nonatomic, strong) AFNetworkReachabilityManager *reachabilityManager;
 
 ///----------------------------
 /// @name Getting Session Tasks
@@ -261,6 +261,28 @@
                                              destination:(NSURL * (^)(NSURL *targetPath, NSURLResponse *response))destination
                                        completionHandler:(void (^)(NSURLResponse *response, NSURL *filePath, NSError *error))completionHandler;
 
+///---------------------------------
+/// @name Getting Progress for Tasks
+///---------------------------------
+
+/**
+ Returns the upload progress of the specified task.
+
+ @param uploadTask The session upload task. Must not be `nil`.
+
+ @return An `NSProgress` object reporting the upload progress of a task, or `nil` if the progress is unavailable.
+ */
+- (NSProgress *)uploadProgressForTask:(NSURLSessionUploadTask *)uploadTask;
+
+/**
+ Returns the download progress of the specified task.
+ 
+ @param downloadTask The session download task. Must not be `nil`.
+ 
+ @return An `NSProgress` object reporting the download progress of a task, or `nil` if the progress is unavailable.
+ */
+- (NSProgress *)downloadProgressForTask:(NSURLSessionDownloadTask *)downloadTask;
+
 ///-----------------------------------------
 /// @name Setting Session Delegate Callbacks
 ///-----------------------------------------
@@ -282,6 +304,13 @@
 ///--------------------------------------
 /// @name Setting Task Delegate Callbacks
 ///--------------------------------------
+
+/**
+ Sets a block to be executed when a task requires a new request body stream to send to the remote server, as handled by the `NSURLSessionTaskDelegate` method `URLSession:task:needNewBodyStream:`.
+
+ @param block A block object to be executed when a task requires a new request body stream.
+ */
+- (void)setTaskNeedNewBodyStreamBlock:(NSInputStream * (^)(NSURLSession *session, NSURLSessionTask *task))block;
 
 /**
  Sets a block to be executed when an HTTP request is attempting to perform a redirection to a different URL, as handled by the `NSURLSessionTaskDelegate` method `URLSession:willPerformHTTPRedirection:newRequest:completionHandler:`.

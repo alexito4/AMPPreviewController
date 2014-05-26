@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0500"
+   LastUpgradeVersion = "0510"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "619F60E169564C06BCD5126C"
+               BlueprintIdentifier = "561F9806CB9340AA9FA3D949"
                BuildableName = "libPods-AMPPreviewController.a"
                BlueprintName = "Pods-AMPPreviewController"
                ReferencedContainer = "container:Pods.xcodeproj">

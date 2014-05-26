@@ -1,6 +1,6 @@
 // AFSerialization.h
 //
-// Copyright (c) 2013 AFNetworking (http://afnetworking.com)
+// Copyright (c) 2013-2014 AFNetworking (http://afnetworking.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,14 @@
 
 #import "AFURLResponseSerialization.h"
 
-extern NSString * const AFNetworkingErrorDomain;
-extern NSString * const AFNetworkingOperationFailingURLResponseErrorKey;
-
 #if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
 #import <UIKit/UIKit.h>
 #elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
 #import <Cocoa/Cocoa.h>
 #endif
+
+extern NSString * const AFNetworkingErrorDomain;
+extern NSString * const AFNetworkingOperationFailingURLResponseErrorKey;
 
 static NSError * AFErrorWithUnderlyingError(NSError *error, NSError *underlyingError) {
     if (!error) {
@@ -46,14 +46,39 @@ static NSError * AFErrorWithUnderlyingError(NSError *error, NSError *underlyingE
     return [[NSError alloc] initWithDomain:error.domain code:error.code userInfo:mutableUserInfo];
 }
 
-static BOOL AFErrorOrUnderlyingErrorHasCode(NSError *error, NSInteger code) {
-    if (error.code == code) {
+static BOOL AFErrorOrUnderlyingErrorHasCodeInDomain(NSError *error, NSInteger code, NSString *domain) {
+    if ([error.domain isEqualToString:domain] && error.code == code) {
         return YES;
     } else if (error.userInfo[NSUnderlyingErrorKey]) {
-        return AFErrorOrUnderlyingErrorHasCode(error.userInfo[NSUnderlyingErrorKey], code);
+        return AFErrorOrUnderlyingErrorHasCodeInDomain(error.userInfo[NSUnderlyingErrorKey], code, domain);
     }
 
     return NO;
+}
+
+static id AFJSONObjectByRemovingKeysWithNullValues(id JSONObject, NSJSONReadingOptions readingOptions) {
+    if ([JSONObject isKindOfClass:[NSArray class]]) {
+        NSMutableArray *mutableArray = [NSMutableArray arrayWithCapacity:[(NSArray *)JSONObject count]];
+        for (id value in (NSArray *)JSONObject) {
+            [mutableArray addObject:AFJSONObjectByRemovingKeysWithNullValues(value, readingOptions)];
+        }
+
+        return (readingOptions & NSJSONReadingMutableContainers) ? mutableArray : [NSArray arrayWithArray:mutableArray];
+    } else if ([JSONObject isKindOfClass:[NSDictionary class]]) {
+        NSMutableDictionary *mutableDictionary = [NSMutableDictionary dictionaryWithDictionary:JSONObject];
+        for (id <NSCopying> key in [(NSDictionary *)JSONObject allKeys]) {
+            id value = [(NSDictionary *)JSONObject objectForKey:key];
+            if (!value || [value isEqual:[NSNull null]]) {
+                [mutableDictionary removeObjectForKey:key];
+            } else if ([value isKindOfClass:[NSArray class]] || [value isKindOfClass:[NSDictionary class]]) {
+                [mutableDictionary setObject:AFJSONObjectByRemovingKeysWithNullValues(value, readingOptions) forKey:key];
+            }
+        }
+
+        return (readingOptions & NSJSONReadingMutableContainers) ? mutableDictionary : [NSDictionary dictionaryWithDictionary:mutableDictionary];
+    }
+
+    return JSONObject;
 }
 
 @implementation AFHTTPResponseSerializer
@@ -102,7 +127,7 @@ static BOOL AFErrorOrUnderlyingErrorHasCode(NSError *error, NSInteger code) {
 
         if (self.acceptableStatusCodes && ![self.acceptableStatusCodes containsIndex:(NSUInteger)response.statusCode]) {
             NSDictionary *userInfo = @{
-                                       NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Request failed: %@ (%d)", @"AFNetworking", nil), [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode], response.statusCode],
+                                       NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Request failed: %@ (%ld)", @"AFNetworking", nil), [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode], (long)response.statusCode],
                                        NSURLErrorFailingURLErrorKey:[response URL],
                                        AFNetworkingOperationFailingURLResponseErrorKey: response
                                        };
@@ -188,14 +213,14 @@ static BOOL AFErrorOrUnderlyingErrorHasCode(NSError *error, NSInteger code) {
     return self;
 }
 
-#pragma mark - AFURLRequestSerialization
+#pragma mark - AFURLResponseSerialization
 
 - (id)responseObjectForResponse:(NSURLResponse *)response
                            data:(NSData *)data
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        if (AFErrorOrUnderlyingErrorHasCode(*error, NSURLErrorCannotDecodeContentData)) {
+        if (AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFNetworkingErrorDomain)) {
             return nil;
         }
     }
@@ -211,33 +236,39 @@ static BOOL AFErrorOrUnderlyingErrorHasCode(NSError *error, NSInteger code) {
     }
 
     id responseObject = nil;
-    NSString *responseString = [[NSString alloc] initWithData:data encoding:stringEncoding];
-    if (responseString && ![responseString isEqualToString:@" "]) {
-        // Workaround for a bug in NSJSONSerialization when Unicode character escape codes are used instead of the actual character
-        // See http://stackoverflow.com/a/12843465/157142
-        data = [responseString dataUsingEncoding:NSUTF8StringEncoding];
+    NSError *serializationError = nil;
+    @autoreleasepool {
+        NSString *responseString = [[NSString alloc] initWithData:data encoding:stringEncoding];
+        if (responseString && ![responseString isEqualToString:@" "]) {
+            // Workaround for a bug in NSJSONSerialization when Unicode character escape codes are used instead of the actual character
+            // See http://stackoverflow.com/a/12843465/157142
+            data = [responseString dataUsingEncoding:NSUTF8StringEncoding];
 
-        NSError *serializationError = nil;
-        if (data) {
-            if ([data length] > 0) {
-                responseObject = [NSJSONSerialization JSONObjectWithData:data options:self.readingOptions error:&serializationError];
+            if (data) {
+                if ([data length] > 0) {
+                    responseObject = [NSJSONSerialization JSONObjectWithData:data options:self.readingOptions error:&serializationError];
+                } else {
+                    return nil;
+                }
             } else {
-                return nil;
+                NSDictionary *userInfo = @{
+                                           NSLocalizedDescriptionKey: NSLocalizedStringFromTable(@"Data failed decoding as a UTF-8 string", nil, @"AFNetworking"),
+                                           NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Could not decode string: %@", nil, @"AFNetworking"), responseString]
+                                           };
+
+                serializationError = [NSError errorWithDomain:AFNetworkingErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:userInfo];
             }
-        } else {
-            NSDictionary *userInfo = @{
-                                       NSLocalizedDescriptionKey: NSLocalizedStringFromTable(@"Data failed decoding as a UTF-8 string", nil, @"AFNetworking"),
-                                       NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Could not decode string: %@", nil, @"AFNetworking"), responseString]
-                                       };
-
-            serializationError = [NSError errorWithDomain:AFNetworkingErrorDomain code:NSURLErrorCannotDecodeContentData userInfo:userInfo];
-        }
-
-        if (error) {
-            *error = AFErrorWithUnderlyingError(serializationError, *error);
         }
     }
 
+    if (self.removesKeysWithNullValues && responseObject) {
+        responseObject = AFJSONObjectByRemovingKeysWithNullValues(responseObject, self.readingOptions);
+    }
+    
+    if (error) {
+        *error = AFErrorWithUnderlyingError(serializationError, *error);;
+    }
+    
     return responseObject;
 }
 
@@ -249,7 +280,7 @@ static BOOL AFErrorOrUnderlyingErrorHasCode(NSError *error, NSInteger code) {
         return nil;
     }
 
-    self.readingOptions = [decoder decodeIntegerForKey:NSStringFromSelector(@selector(readingOptions))];
+    self.readingOptions = (NSJSONReadingOptions)[decoder decodeIntegerForKey:NSStringFromSelector(@selector(readingOptions))];
 
     return self;
 }
@@ -299,7 +330,7 @@ static BOOL AFErrorOrUnderlyingErrorHasCode(NSError *error, NSInteger code) {
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        if (AFErrorOrUnderlyingErrorHasCode(*error, NSURLErrorCannotDecodeContentData)) {
+        if (AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFNetworkingErrorDomain)) {
             return nil;
         }
     }
@@ -344,7 +375,7 @@ static BOOL AFErrorOrUnderlyingErrorHasCode(NSError *error, NSInteger code) {
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        if (AFErrorOrUnderlyingErrorHasCode(*error, NSURLErrorCannotDecodeContentData)) {
+        if (AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFNetworkingErrorDomain)) {
             return nil;
         }
     }
@@ -420,16 +451,6 @@ static BOOL AFErrorOrUnderlyingErrorHasCode(NSError *error, NSInteger code) {
     return self;
 }
 
-+ (NSSet *)acceptablePathExtensions {
-    static NSSet * _acceptablePathExtension = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _acceptablePathExtension = [[NSSet alloc] initWithObjects:@"plist", nil];
-    });
-
-    return _acceptablePathExtension;
-}
-
 #pragma mark - AFURLResponseSerialization
 
 - (id)responseObjectForResponse:(NSURLResponse *)response
@@ -437,7 +458,7 @@ static BOOL AFErrorOrUnderlyingErrorHasCode(NSError *error, NSInteger code) {
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        if (AFErrorOrUnderlyingErrorHasCode(*error, NSURLErrorCannotDecodeContentData)) {
+        if (AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFNetworkingErrorDomain)) {
             return nil;
         }
     }
@@ -465,7 +486,7 @@ static BOOL AFErrorOrUnderlyingErrorHasCode(NSError *error, NSInteger code) {
     }
 
     self.format = (NSPropertyListFormat)[decoder decodeIntegerForKey:NSStringFromSelector(@selector(format))];
-    self.readOptions = [decoder decodeIntegerForKey:NSStringFromSelector(@selector(readOptions))];
+    self.readOptions = (NSPropertyListReadOptions)[decoder decodeIntegerForKey:NSStringFromSelector(@selector(readOptions))];
 
     return self;
 }
@@ -526,9 +547,8 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
 
     CGDataProviderRelease(dataProvider);
 
-    UIImage *image = nil;
+    UIImage *image = AFImageWithDataAtScale(data, scale);
     if (!imageRef) {
-        image = AFImageWithDataAtScale(data, scale);
         if (image.images || !image) {
             return image;
         }
@@ -544,10 +564,6 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
     size_t bitsPerComponent = CGImageGetBitsPerComponent(imageRef);
 
     if (width * height > 1024 * 1024 || bitsPerComponent > 8) {
-        if (!image) {
-            image = [[UIImage alloc] initWithCGImage:imageRef scale:scale orientation:image.imageOrientation];
-        }
-
         CGImageRelease(imageRef);
 
         return image;
@@ -574,10 +590,6 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
     CGColorSpaceRelease(colorSpace);
 
     if (!context) {
-        if (!image) {
-            image = [[UIImage alloc] initWithCGImage:imageRef scale:scale orientation:image.imageOrientation];
-        }
-
         CGImageRelease(imageRef);
 
         return image;
@@ -616,16 +628,6 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
     return self;
 }
 
-+ (NSSet *)acceptablePathExtensions {
-    static NSSet *_acceptablePathExtension = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _acceptablePathExtension = [[NSSet alloc] initWithObjects:@"tif", @"tiff", @"jpg", @"jpeg", @"gif", @"png", @"ico", @"bmp", @"cur", nil];
-    });
-
-    return _acceptablePathExtension;
-}
-
 #pragma mark - AFURLResponseSerializer
 
 - (id)responseObjectForResponse:(NSURLResponse *)response
@@ -633,7 +635,7 @@ static UIImage * AFInflatedImageFromResponseWithDataAtScale(NSHTTPURLResponse *r
                           error:(NSError *__autoreleasing *)error
 {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
-        if (AFErrorOrUnderlyingErrorHasCode(*error, NSURLErrorCannotDecodeContentData)) {
+        if (AFErrorOrUnderlyingErrorHasCodeInDomain(*error, NSURLErrorCannotDecodeContentData, AFNetworkingErrorDomain)) {
             return nil;
         }
     }
