@@ -69,7 +69,10 @@
     if ([self.previewItem respondsToSelector:@selector(remoteUrl)]
         && [(id <AMPPreviewItem>)self.previewItem remoteUrl]) {
         
-        if ([[NSFileManager defaultManager] fileExistsAtPath:[[self.previewItem previewItemURL] path]]) {
+        id <AMPPreviewItem> item = (id <AMPPreviewItem>)self.previewItem;
+        NSURL *suggestedLocalURL = [self destinationPathForURL:[item remoteUrl]];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:[suggestedLocalURL path]]) {
+            item.previewItemURL = suggestedLocalURL;
             self.dataSource = self;
             [self reloadData];
         } else {
@@ -80,6 +83,13 @@
         self.dataSource = self;
         [self reloadData];
     }
+}
+
+- (NSURL *)destinationPathForURL:(NSURL *)url {
+    NSURL *documentsDirectoryPath = [NSURL fileURLWithPath:[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject]];
+    NSString *name = [url lastPathComponent];
+    NSURL *path = [documentsDirectoryPath URLByAppendingPathComponent:name];
+    return path;
 }
 
 #pragma mark -
@@ -96,9 +106,7 @@
     NSURLRequest *request = [NSURLRequest requestWithURL:URL];
     
     NSURLSessionDownloadTask *downloadTask = [manager downloadTaskWithRequest:request progress:nil destination:^NSURL *(NSURL *targetPath, NSURLResponse *response) {
-        NSURL *documentsDirectoryPath = [NSURL fileURLWithPath:[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject]];
-        NSURL *path = [documentsDirectoryPath URLByAppendingPathComponent:[response suggestedFilename]];
-        return path;
+        return [self destinationPathForURL:URL];
     } completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
         if (!error) {
             NSLog(@"File downloaded to: %@", filePath);
