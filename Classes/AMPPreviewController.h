@@ -26,12 +26,10 @@
  *
  *  This class downloads the document and then reloads the preview.
  *
- *  This class is deisgned to work with only one document at a time.
- *  So the developer doesn't need to deal with dataSource methods,
- *  just instantiate and present ;)
+ *  This class is designed to work with only one document at a time.
+ *  Also you can use a NSURL directly! Without the need of creating a QLPreviewItem conforming object.
+ *  So the developer doesn't need to deal with dataSource methods, just instantiate and present ;)
  *
- *  Also you can use directly NSURL's! Without creating a QLPreviewItem
- *  conforming object.
  */
 
 typedef void (^AMPPreviewControllerStartDownload)();
