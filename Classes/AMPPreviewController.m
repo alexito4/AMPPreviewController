@@ -121,7 +121,7 @@
         return [self destinationPathForURL:URL];
     } completionHandler:^(NSURLResponse *response, NSURL *filePath, NSError *error) {
         if (!error) {
-            NSLog(@"File downloaded to: %@", filePath);
+//            NSLog(@"File downloaded to: %@", filePath);
             
             if ([self.previewItem isKindOfClass:[AMPPreviewObject class]]) {
                 [(AMPPreviewObject *)self.previewItem setPreviewItemTitle:[response suggestedFilename]];

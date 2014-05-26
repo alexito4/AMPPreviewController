@@ -20,7 +20,12 @@
     // DOWNLOAD FROM A REMOTE URL
     AMPPreviewController *pc = [[AMPPreviewController alloc]
                                 initWithRemoteFile:[NSURL URLWithString:@"http://scholar.harvard.edu/files/rogoff/files/growth_in_time_debt_aer.pdf"]];
-    
+    [pc setStartDownloadBlock:^(){
+        NSLog(@"Start download");
+    }];
+    [pc setFinishDownloadBlock:^(NSError *error){
+        NSLog(@"Download finished %@", error);
+    }];
     [self presentViewController:pc animated:YES completion:nil];
 }
 
