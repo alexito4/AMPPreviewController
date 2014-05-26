@@ -1,15 +1,27 @@
+// Copyright (c) 2014 Alejandro Martinez
 //
-//  AMPPreviewController.h
-//  uikitadditions
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-//  Created by Alejandro Martinez on 09/09/12.
-//  Copyright (c) 2012 Alejandro Martinez. All rights reserved.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #import <QuickLook/QuickLook.h>
 
 /**
- *  AMPPreviewController it's a subclass of QLPreviewController that
+ *  AMPPreviewController is a subclass of QLPreviewController that
  *  allows you to preview remote documents.
  *
  *  This class downloads the document and then reloads the preview.
@@ -36,7 +48,7 @@ typedef void (^AMPPreviewControllerFinishDownload)(NSError *error);
 /**
  *  Use a confirming <QLPreviewItem> object.
  *  It's the same as using QLPreviewController directly but
- *  Not need to implement QLPreviewControllerDataSource!
+ *  thre is no need to implement QLPreviewControllerDataSource!
  *
  *  But you can use a <AMPPreviewItem> conforming object also.
  *  If the object has the remoteUrl != nil it will donwload the file.
@@ -48,7 +60,8 @@ typedef void (^AMPPreviewControllerFinishDownload)(NSError *error);
 
 /**
  *  Use just a file path.
- *  No need to create a confirming <QLPreviewItem> object.
+ *  No need to create a confirming <QLPreviewItem> object
+ *  nor implementing the data source.
  *
  *  @param filePath The path for the local document
  */
@@ -56,18 +69,20 @@ typedef void (^AMPPreviewControllerFinishDownload)(NSError *error);
 
 /**
  *  Use a remote url.
- *  This will donwload and preview the remote document.
- *
- *  Note: This methos always will download the file. It
- *  can't know if the file is alredy downloaded. Use
- *  -initWithPreviewItem: with a <AMPPreviewItem> object
- *  instead.
+ *  This will download and preview the remote document.
  *
  *  @param remoteUrl The url for the remote document
  */
 - (id)initWithRemoteFile:(NSURL *)remoteUrl;
 
+/**
+ *  Executed when the download of the file starts.
+ */
 @property (nonatomic, copy) AMPPreviewControllerStartDownload startDownloadBlock;
+
+/**
+ *  Executed when the download of the file has ended.
+ */
 @property (nonatomic, copy) AMPPreviewControllerFinishDownload finishDownloadBlock;
 
 @end

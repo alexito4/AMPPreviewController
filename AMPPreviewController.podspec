@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
   s.name             = 'AMPPreviewController'
   s.version          = '0.1'
-  s.summary          = 'AMPPreviewController is a subclass of QLPreviewController that allows remote URL'
+  s.summary          = 'AMPPreviewController is a subclass of QLPreviewController that allows you to preview remote documents.'
   #s.description      = <<-DESC
   #                     A little class to use the Imageholder API in your Apps.
   #                     DESC
@@ -12,7 +12,6 @@ Pod::Spec.new do |s|
   s.author           = { "Alejandro Martinez" => "alexito4@gmail.com" }
   s.source           = { :git => "https://github.com/alexito4/AMPPreviewController.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/alexito4'
-
 
   s.dependency 'AFNetworking', '~> 2.2'
 
