@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name             = 'AMPPreviewController'
-  s.version          = '0.1'
+  s.version          = '0.3'
   s.summary          = 'AMPPreviewController is a subclass of QLPreviewController that allows you to preview remote documents.'
   #s.description      = <<-DESC
   #                     A little class to use the Imageholder API in your Apps.
