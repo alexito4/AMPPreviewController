@@ -19,7 +19,7 @@
 - (IBAction)openFromRemoteURL:(id)sender {
     // DOWNLOAD FROM A REMOTE URL
     AMPPreviewController *pc = [[AMPPreviewController alloc]
-                                initWithRemoteFile:[NSURL URLWithString:@"http://scholar.harvard.edu/files/rogoff/files/growth_in_time_debt_aer.pdf"]];
+                                initWithRemoteFile:[NSURL URLWithString:@"http://scholar.harvard.edu/files/rogoff/files/growth_in_time_debt_aer.pdf"] title:@"Growth in time"];
     [pc setStartDownloadBlock:^(){
         NSLog(@"Start download");
     }];
