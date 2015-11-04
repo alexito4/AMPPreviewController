@@ -65,10 +65,14 @@
 }
 
 - (id)initWithRemoteFile:(NSURL *)remoteUrl {
+    return [self initWithRemoteFile:remoteUrl title:@"Title"];
+}
+
+- (id)initWithRemoteFile:(NSURL *)remoteUrl title:(NSString *)title {
     self = [self init];
     if (self) {
         AMPPreviewObject *item = [AMPPreviewObject new];
-        item.previewItemTitle = @"Title";
+        item.previewItemTitle = title;
         item.remoteUrl = remoteUrl;
         _previewItem = item;
     }
