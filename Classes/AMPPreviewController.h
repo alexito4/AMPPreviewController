@@ -38,7 +38,7 @@ typedef void (^AMPPreviewControllerFinishDownload)(NSError *error);
 @protocol AMPPreviewItem <QLPreviewItem>
 @required
 - (NSURL *)remoteUrl;
-@property (strong) NSURL * previewItemURL;
+@property (readwrite, nonatomic) NSURL * previewItemURL;
 @end
 
 @interface AMPPreviewController : QLPreviewController

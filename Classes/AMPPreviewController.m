@@ -26,8 +26,8 @@
 
 @interface AMPPreviewObject : NSObject <AMPPreviewItem>
 @property (nonatomic, strong) NSURL *remoteUrl;
-@property (strong, readwrite) NSURL *previewItemURL;
-@property (strong, readwrite) NSString *previewItemTitle;
+@property (nonatomic, strong, readwrite) NSURL *previewItemURL;
+@property (nonatomic, strong, readwrite) NSString *previewItemTitle;
 @end
 
 @implementation AMPPreviewObject
