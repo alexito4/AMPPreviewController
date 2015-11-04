@@ -36,8 +36,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2D510616F2DF4148845B5BB6 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 		41EE07C27FD24EF1A6F8329B /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A531B9CFF41D4EBBDB0161D /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		AA51B9D9979B12E7E07C1165 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		FA3437BE18B4E16700AFC942 /* AMPPreviewControllerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AMPPreviewControllerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA3437C118B4E16700AFC942 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		FA3437C318B4E16700AFC942 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -86,6 +87,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		96CE497F6380778643497479 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				AA51B9D9979B12E7E07C1165 /* Pods.debug.xcconfig */,
+				8A531B9CFF41D4EBBDB0161D /* Pods.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		FA3437B518B4E16700AFC942 = {
 			isa = PBXGroup;
 			children = (
@@ -93,7 +103,7 @@
 				FA3437E618B4E16700AFC942 /* AMPPreviewControllerExampleTests */,
 				FA3437C018B4E16700AFC942 /* Frameworks */,
 				FA3437BF18B4E16700AFC942 /* Products */,
-				2D510616F2DF4148845B5BB6 /* Pods.xcconfig */,
+				96CE497F6380778643497479 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -175,6 +185,7 @@
 				FA3437BB18B4E16700AFC942 /* Frameworks */,
 				FA3437BC18B4E16700AFC942 /* Resources */,
 				090AA08A14AD4251B81E0D70 /* Copy Pods Resources */,
+				EC8C5C7A5BEFDF374F7001E8 /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -210,7 +221,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = AMP;
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "Alejandro Martinez";
 				TargetAttributes = {
 					FA3437DE18B4E16700AFC942 = {
@@ -271,7 +282,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		6B84B7484D4642EEA5F257E7 /* Check Pods Manifest.lock */ = {
@@ -287,6 +298,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		EC8C5C7A5BEFDF374F7001E8 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -353,7 +379,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -368,6 +393,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -392,7 +418,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -423,13 +448,14 @@
 		};
 		FA3437F118B4E16700AFC942 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2D510616F2DF4148845B5BB6 /* Pods.xcconfig */;
+			baseConfigurationReference = AA51B9D9979B12E7E07C1165 /* Pods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AMPPreviewControllerExample/AMPPreviewControllerExample-Prefix.pch";
 				INFOPLIST_FILE = "AMPPreviewControllerExample/AMPPreviewControllerExample-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alejandromp.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -437,13 +463,14 @@
 		};
 		FA3437F218B4E16700AFC942 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2D510616F2DF4148845B5BB6 /* Pods.xcconfig */;
+			baseConfigurationReference = 8A531B9CFF41D4EBBDB0161D /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AMPPreviewControllerExample/AMPPreviewControllerExample-Prefix.pch";
 				INFOPLIST_FILE = "AMPPreviewControllerExample/AMPPreviewControllerExample-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alejandromp.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -452,7 +479,6 @@
 		FA3437F418B4E16700AFC942 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/AMPPreviewControllerExample.app/AMPPreviewControllerExample";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -466,6 +492,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "AMPPreviewControllerExampleTests/AMPPreviewControllerExampleTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alejandromp.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -475,7 +502,6 @@
 		FA3437F518B4E16700AFC942 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/AMPPreviewControllerExample.app/AMPPreviewControllerExample";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -485,6 +511,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AMPPreviewControllerExample/AMPPreviewControllerExample-Prefix.pch";
 				INFOPLIST_FILE = "AMPPreviewControllerExampleTests/AMPPreviewControllerExampleTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alejandromp.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
