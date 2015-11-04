@@ -74,6 +74,15 @@ typedef void (^AMPPreviewControllerFinishDownload)(NSError *error);
 - (id)initWithRemoteFile:(NSURL *)remoteUrl;
 
 /**
+ *  Use a remote url.
+ *  This will download and preview the remote document.
+ *
+ *  @param remoteUrl The url for the remote document
+ *  @param title The default title for the remote document
+ */
+- (id)initWithRemoteFile:(NSURL *)remoteUrl title:(NSString *)title;
+
+/**
  *  Executed when the download of the file starts.
  */
 @property (nonatomic, copy) AMPPreviewControllerStartDownload startDownloadBlock;
