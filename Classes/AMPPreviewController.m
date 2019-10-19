@@ -57,7 +57,7 @@
     self = [self init];
     if (self) {
         AMPPreviewObject *item = [AMPPreviewObject new];
-        item.previewItemTitle = @"Title";
+        item.previewItemTitle = filePath.lastPathComponent;
         item.previewItemURL = filePath;
         _previewItem = item;
     }
@@ -65,7 +65,7 @@
 }
 
 - (id)initWithRemoteFile:(NSURL *)remoteUrl {
-    return [self initWithRemoteFile:remoteUrl title:@"Title"];
+    return [self initWithRemoteFile:remoteUrl title:remoteUrl.lastPathComponent];
 }
 
 - (id)initWithRemoteFile:(NSURL *)remoteUrl title:(NSString *)title {
