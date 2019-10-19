@@ -45,6 +45,10 @@
 
 @implementation AMPPreviewController
 
++ (NSURL *)tempRemoteURLFilesDirectory {
+    return [NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES];
+}
+
 - (id)initWithPreviewItem:(id<QLPreviewItem>)item {
     self = [self init];
     if (self) {
@@ -102,7 +106,7 @@
 }
 
 - (NSURL *)destinationPathForURL:(NSURL *)url {
-    NSURL *documentsDirectoryPath = [NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES];
+    NSURL *documentsDirectoryPath = AMPPreviewController.tempRemoteURLFilesDirectory;
     NSString *name = [url lastPathComponent];
     NSURL *path = [documentsDirectoryPath URLByAppendingPathComponent:name];
     return path;
