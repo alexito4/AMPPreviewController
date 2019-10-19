@@ -102,7 +102,7 @@
 }
 
 - (NSURL *)destinationPathForURL:(NSURL *)url {
-    NSURL *documentsDirectoryPath = [NSURL fileURLWithPath:[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject]];
+    NSURL *documentsDirectoryPath = [NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES];
     NSString *name = [url lastPathComponent];
     NSURL *path = [documentsDirectoryPath URLByAppendingPathComponent:name];
     return path;
