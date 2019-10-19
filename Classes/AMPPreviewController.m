@@ -79,12 +79,12 @@
     return self;
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
     if ([self.previewItem respondsToSelector:@selector(remoteUrl)]
         && [(id <AMPPreviewItem>)self.previewItem remoteUrl]) {
-        
+
         id <AMPPreviewItem> item = (id <AMPPreviewItem>)self.previewItem;
         NSURL *suggestedLocalURL = [self destinationPathForURL:[item remoteUrl]];
         if ([[NSFileManager defaultManager] fileExistsAtPath:[suggestedLocalURL path]]) {
@@ -94,7 +94,7 @@
         } else {
             [self downloadFile];
         }
-        
+
     } else {
         self.dataSource = self;
         [self reloadData];
