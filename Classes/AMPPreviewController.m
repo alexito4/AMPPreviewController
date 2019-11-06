@@ -45,6 +45,10 @@
 
 @implementation AMPPreviewController
 
++ (NSURL *)tempRemoteURLFilesDirectory {
+    return [NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES];
+}
+
 - (id)initWithPreviewItem:(id<QLPreviewItem>)item {
     self = [self init];
     if (self) {
@@ -57,7 +61,7 @@
     self = [self init];
     if (self) {
         AMPPreviewObject *item = [AMPPreviewObject new];
-        item.previewItemTitle = @"Title";
+        item.previewItemTitle = filePath.lastPathComponent;
         item.previewItemURL = filePath;
         _previewItem = item;
     }
@@ -65,7 +69,7 @@
 }
 
 - (id)initWithRemoteFile:(NSURL *)remoteUrl {
-    return [self initWithRemoteFile:remoteUrl title:@"Title"];
+    return [self initWithRemoteFile:remoteUrl title:remoteUrl.lastPathComponent];
 }
 
 - (id)initWithRemoteFile:(NSURL *)remoteUrl title:(NSString *)title {
@@ -79,12 +83,12 @@
     return self;
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
     if ([self.previewItem respondsToSelector:@selector(remoteUrl)]
         && [(id <AMPPreviewItem>)self.previewItem remoteUrl]) {
-        
+
         id <AMPPreviewItem> item = (id <AMPPreviewItem>)self.previewItem;
         NSURL *suggestedLocalURL = [self destinationPathForURL:[item remoteUrl]];
         if ([[NSFileManager defaultManager] fileExistsAtPath:[suggestedLocalURL path]]) {
@@ -94,7 +98,7 @@
         } else {
             [self downloadFile];
         }
-        
+
     } else {
         self.dataSource = self;
         [self reloadData];
@@ -102,7 +106,7 @@
 }
 
 - (NSURL *)destinationPathForURL:(NSURL *)url {
-    NSURL *documentsDirectoryPath = [NSURL fileURLWithPath:[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject]];
+    NSURL *documentsDirectoryPath = AMPPreviewController.tempRemoteURLFilesDirectory;
     NSString *name = [url lastPathComponent];
     NSURL *path = [documentsDirectoryPath URLByAppendingPathComponent:name];
     return path;

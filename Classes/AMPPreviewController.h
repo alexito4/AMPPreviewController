@@ -44,6 +44,12 @@ typedef void (^AMPPreviewControllerFinishDownload)(NSError *error);
 @interface AMPPreviewController : QLPreviewController
 
 /**
+ The URL of the destination directory for the downloaded assets from
+ remoteURL
+ */
+@property (nonatomic, strong, readonly, class) NSURL *tempRemoteURLFilesDirectory;
+
+/**
  *  Use a confirming <QLPreviewItem> object.
  *  It's the same as using QLPreviewController directly but
  *  thre is no need to implement QLPreviewControllerDataSource!

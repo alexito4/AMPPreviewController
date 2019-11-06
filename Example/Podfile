@@ -1,3 +1,5 @@
 platform :ios, '7.0'
 
-pod 'AMPPreviewController', :path => '../AMPPreviewController.podspec'
+target 'AMPPreviewControllerExample' do
+	pod 'AMPPreviewController', :path => '../AMPPreviewController.podspec'
+end
